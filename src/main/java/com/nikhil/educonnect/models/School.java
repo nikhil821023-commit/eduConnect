@@ -31,4 +31,12 @@ public class School extends User{
     public String getBoard() {
         return board;
     }
+
+    @Override
+    public String toString() {
+        return "School{name=" + schoolName +
+                ", city=" + city +
+                ", board=" + board + "}";
+    }
+
 }
