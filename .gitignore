@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+# Never push these to GitHub
+src/main/resources/application.properties
+
+# Maven
+target/
+
+# IntelliJ
+.idea/
+*.iml
