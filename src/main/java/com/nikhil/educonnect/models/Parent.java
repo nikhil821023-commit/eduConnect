@@ -18,4 +18,11 @@ public class Parent extends User{
     public String getChildGrade() {
         return childGrade;
     }
+
+    @Override
+    public String toString() {
+        return "Parent{name=" + getName() +
+                ", city=" + city +
+                ", childGrade=" + childGrade + "}";
+    }
 }
