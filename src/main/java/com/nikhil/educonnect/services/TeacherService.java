@@ -21,16 +21,19 @@ public class TeacherService {
     // Register new teacher
     public TeacherResponse register(TeacherRegisterRequest request) {
 
-        // Check if email already taken
         if (request.getEmail() == null || request.getEmail().isEmpty()) {
             throw new RuntimeException("Email is required");
         }
 
-        // Create teacher object
+        // ✅ Check if email already exists
+        if (teacherRepository.existsByEmail(request.getEmail())) {
+            throw new UserAlreadyExistsException("Email already exists: " + request.getEmail());
+        }
+
         Teacher teacher = new Teacher(
                 request.getName(),
                 request.getEmail(),
-                request.getPassword(), // plain text for now — Phase 5 adds encryption
+                request.getPassword(), // plain text for now — replace with hashing later
                 request.getSubject(),
                 request.getExperienceYears(),
                 request.getCity()
@@ -40,9 +43,7 @@ public class TeacherService {
             teacher.setBio(request.getBio());
         }
 
-        // Save to database
         Teacher saved = teacherRepository.save(teacher);
-
         return toResponse(saved);
     }
 
@@ -65,12 +66,10 @@ public class TeacherService {
 
     // Search by city and/or subject
     public List<TeacherResponse> search(String city, String subject) {
-
         List<Teacher> results;
 
         if (city != null && subject != null) {
-            results = teacherRepository
-                    .findByCityAndSubjectAndIsAvailableTrue(city, subject);
+            results = teacherRepository.findByCityAndSubjectAndIsAvailableTrue(city, subject);
         } else if (city != null) {
             results = teacherRepository.findByCity(city);
         } else if (subject != null) {
@@ -88,8 +87,11 @@ public class TeacherService {
     }
 
     // Convert Teacher entity → TeacherResponse DTO
-    // We never send password back to frontend
     private TeacherResponse toResponse(Teacher teacher) {
+        if (teacher == null) {
+            throw new IllegalArgumentException("Teacher cannot be null");
+        }
+
         TeacherResponse response = new TeacherResponse();
         response.setId(teacher.getId());
         response.setName(teacher.getName());
